@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Variables de entorno (contienen secretos)
+.env
+.env.local
+
+# Base de datos local
+data/castellana.db
+data/castellana.db-journal
+data/castellana.db-wal
+data/castellana.db-shm
+
+# Outputs generados
+data/outputs/*.pdf
+data/outputs/*.csv
+data/outputs/*.json
+
+# Logs
+data/logs/*.log
+
+# Staging (logs nuevos pendientes)
+data/staging/*.csv
+
+# Modelos candidatos (no se versionan; el original si)
+data/models/candidates/*.joblib
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store

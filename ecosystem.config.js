@@ -35,4 +35,3 @@ module.exports = {
     instances: 1,
   }],
 };
-EOF

@@ -37,12 +37,67 @@ from services.conversion_botellas import unidades_a_botellas
 # ============================================================
 # Carga del modelo activo
 # ============================================================
+def _extraer_modelo_predecible(obj):
+    """
+    Extrae el modelo con metodo .predict() de lo que devuelve joblib.load().
+
+    Esto es necesario porque el modelo M3 entregado por Jose Emilio
+    (lgbm_v1.joblib) NO se guardo como Booster/LGBMRegressor directo,
+    sino como un dict de artefactos con estructura tipo:
+        {
+            "model": <LGBMRegressor o Booster>,
+            "feature_names": [...],
+            "config": {...},
+            ...
+        }
+
+    En cambio, los modelos que entrena retrain_service.py se guardan
+    como LGBMRegressor desnudos con joblib.dump(model, path), asi que
+    tienen .predict() directo.
+
+    Esta funcion es tolerante a ambos formatos:
+      - Si el objeto cargado ya tiene .predict(), lo devuelve tal cual.
+      - Si es un dict, busca el modelo en las llaves comunes.
+      - Si no encuentra nada, lanza TypeError con info de debug.
+    """
+    # Caso 1: ya es un modelo con .predict() (LGBMRegressor, Booster, etc.)
+    if hasattr(obj, "predict") and callable(obj.predict):
+        return obj
+
+    # Caso 2: es un dict de artefactos - buscar el modelo dentro
+    if isinstance(obj, dict):
+        # Llaves comunes en orden de prioridad
+        for key in (
+            "model", "modelo", "booster", "estimator",
+            "regressor", "clf", "lgbm", "lgb_model", "lgbm_model",
+        ):
+            candidate = obj.get(key)
+            if candidate is not None and hasattr(candidate, "predict") and callable(candidate.predict):
+                return candidate
+
+        # Fallback: cualquier valor del dict que tenga .predict
+        for v in obj.values():
+            if hasattr(v, "predict") and callable(v.predict):
+                return v
+
+        raise TypeError(
+            f"El archivo cargado es un dict pero ninguna de sus llaves "
+            f"contiene un objeto con .predict(). Llaves disponibles: "
+            f"{list(obj.keys())}"
+        )
+
+    raise TypeError(
+        f"No se pudo extraer un modelo predecible. Tipo cargado: "
+        f"{type(obj).__name__}"
+    )
+
+
 def cargar_modelo_activo() -> dict:
     """
     Carga el modelo marcado como is_active=1 en la BD. Retorna un dict:
         {
             "version": "...",
-            "model": <objeto LightGBM>,
+            "model": <objeto LightGBM con .predict>,
             "path": "...",
             "wape_val": ...,
         }
@@ -64,7 +119,10 @@ def cargar_modelo_activo() -> dict:
     if not path.exists():
         raise FileNotFoundError(f"Archivo del modelo no existe: {path}")
 
-    model = joblib.load(path)
+    # Carga tolerante a dict de artefactos M3 o LGBMRegressor desnudo
+    raw_loaded = joblib.load(path)
+    model = _extraer_modelo_predecible(raw_loaded)
+
     return {
         "version": version,
         "model": model,

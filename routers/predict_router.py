@@ -154,6 +154,8 @@ async def predecir(
             fallback_used=resultado["fallback_used"],
             fallback_reason=resultado["fallback_reason"],
             alertas_contextuales=alertas_texto,
+            wape_val=resultado.get("wape_val"),
+            wape_simple_val=resultado.get("wape_simple_val"),
         )
     except Exception as e:
         # El PDF es secundario; si falla, log pero no romper la respuesta

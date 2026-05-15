@@ -258,6 +258,7 @@ def generar_prediccion_dia(
     fallback_used = False
     fallback_reason = None
     model_version = "baseline_pm4w"
+    model_wape_val: float | None = None  # WAPE Ponderado del modelo en VAL (para pie del PDF)
     pred_raw_df = None
 
     # -----------------------------------------------------------
@@ -268,6 +269,7 @@ def generar_prediccion_dia(
         info_modelo = cargar_modelo_activo()
         model = info_modelo["model"]
         model_version = info_modelo["version"]
+        model_wape_val = info_modelo.get("wape_val")
 
         # Construir features. fecha_corte_train = ayer
         df_feat = construir_features(df_hist, fecha_corte_train=fecha_ts - pd.Timedelta(days=1))
@@ -426,4 +428,6 @@ def generar_prediccion_dia(
         "log_path": str(log_path),
         "fallback_used": fallback_used,
         "fallback_reason": fallback_reason,
+        "wape_val": model_wape_val,
+        "wape_simple_val": None,  # Reservado para futura extension
     }

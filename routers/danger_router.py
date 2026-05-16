@@ -217,7 +217,7 @@ async def jumpstart(
                 n_preds += 1
 
                 # Algunas modificaciones del gerente (~15% de SKUs cuando firma)
-                if rng.random() < 0.15:
+                if rng.random() < 0.015:
                     nuevo = max(0, int(pred_final * rng.uniform(0.6, 1.3)))
                     modifs[sku] = {"original": int(pred_final), "modified": nuevo}
 

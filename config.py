@@ -97,11 +97,12 @@ class Settings(BaseSettings):
 
     # ----- CORS (frontend React Vite TypeScript) -----
     CORS_ORIGINS: list = [
-        "http://localhost:5173",         # Vite dev server
-        "http://localhost:4173",         # Vite preview
-        "https://cantinalcastellana.com",
-        "https://www.cantinalcastellana.com",
-        "https://app.cantinalcastellana.com",
+    "http://localhost:5173",
+    "http://localhost:4173",
+    "https://cantinalacastellana.com",
+    "https://www.cantinalacastellana.com",
+    "https://model.cantinalacastellana.com",
+    "https://app.cantinalacastellana.com",
     ]
 
     # ----- Modo de operacion -----

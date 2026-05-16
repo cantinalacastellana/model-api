@@ -37,7 +37,7 @@ from routers.drift_router import router as drift_router
 from routers.admin_router import router as admin_router
 from routers.llm_router import router as llm_router
 from routers.metrics_router import router as metrics_router
-
+from routers.danger_router import router as danger_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -105,7 +105,7 @@ app.include_router(drift_router)
 app.include_router(admin_router)
 app.include_router(llm_router)
 app.include_router(metrics_router)
-
+app.include_router(danger_router)
 
 @app.get("/health", tags=["health"])
 async def health():
